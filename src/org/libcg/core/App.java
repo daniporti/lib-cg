@@ -1,67 +1,61 @@
 package org.libcg.core;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.Arrays;
+import java.util.Map;
 import org.libcg.database.DbInit;
 
 public class App {
+    private static App instance;
+    private static AppProvider provider;
+    private Map<String, Object> instances;
+    
+    private App() {}
+    
+    public static App getInstance() {
+        if (App.instance == null) {
+            App.instance = new App();
+        }
+        
+        return App.instance;
+    }
+    
+    public static void useProvider(AppProvider provider) {
+        App.provider = provider;
+        
+        App.provider.register(App.getInstance());
+    }
+    
+    public <T> void singleton(Class<T> clazz, AppSingletonCallback<T> function) {
+        this.instances.put(clazz.getName(), function.call());
+    }
+    
+    public <T> T make(Class<T> clazz) {
+        return (T) this.instances.get(clazz.getName());
+    }
+    
     public static <T extends Controller> void run(Class<T> entrypoint) {
         try {
             Connection connection = Persistence.getConnection();
             
-            Arrays.asList(DbInit.run())
-                    .stream()
-                    .forEach(query -> {
-                        try {
-                            connection.prepareCall(query)
-                                    .execute();
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    });
-            T instance = entrypoint.getDeclaredConstructor().newInstance();
-
-            instance.main();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
-                InvocationTargetException | SQLException e) {
+            for (String query : Arrays.asList(DbInit.run())) {
+                connection.prepareCall(query).execute();
+            }
+            
+            App.getInstance().make(entrypoint).principal();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     
-    public <T> void call(Class<T> clazz) {
-        call(clazz, null);
-    }
-    
-    public <T> void call(Class<T> clazz, String methodName, Object... args) {
+    public <T extends View> void render(Class<T> clazz) {
         try {
-            T instance = clazz.getDeclaredConstructor().newInstance();
-
-            // Se um método específico foi fornecido, encontre-o
-            if (methodName != null) {
-                Method method = clazz.getMethod(methodName, getParameterTypes(args));
-                method.invoke(instance, args);
-            } else {
-                // Se nenhum método foi fornecido, chame o método padrão (sem parâmetros)
-                Method method = clazz.getMethod("main");
-                method.invoke(instance);
-            }
-
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
-                InvocationTargetException e) {
+            T view = (T) clazz.getDeclaredConstructor().newInstance();
+            
+            view.render();
+        } catch(ReflectiveOperationException e) {
             e.printStackTrace();
-        }
-    }
-
-    private Class<?>[] getParameterTypes(Object[] args) {
-        Class<?>[] parameterTypes = new Class[args.length];
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] != null) {
-                parameterTypes[i] = args[i].getClass();
-            }
         }
         
-        return parameterTypes;
     }
 }

@@ -4,8 +4,8 @@ public abstract class Controller {
     protected final App app;
     
     public Controller() {
-        app = new App();
+        app = App.getInstance();
     }
     
-    public abstract void main();
+    public abstract void principal();
 }

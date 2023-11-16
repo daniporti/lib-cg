@@ -7,7 +7,9 @@ public abstract class View {
     protected final Scanner scanner;
     
     public View() {
-        app = new App();
+        app = App.getInstance();
         scanner = new Scanner(System.in);
     }
+    
+    public abstract void render();
 }

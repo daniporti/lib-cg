@@ -2,42 +2,69 @@ package org.libcg.controllers;
 
 import java.util.List;
 import org.libcg.core.Controller;
+import org.libcg.dto.LivroDTO;
 
 import org.libcg.models.Livro;
-import org.libcg.views.LivroView;
+import org.libcg.views.livro.CadastraLivroScreen;
+import org.libcg.views.livro.ListaLivroScreen;
+import org.libcg.views.livro.LivrosPrincipalScreen;
+import org.libcg.views.livro.MostraLivroScreen;
 
 public class LivroController extends Controller {
-
+    
     @Override
-    public void main() {
+    public void principal() {
+        LivrosPrincipalScreen view = new LivrosPrincipalScreen();
+        
+        view.render();
+    }
+
+    public void listar() {
         List<Livro> livros = Livro.findAll(Livro.class);
+        List<LivroDTO> livroDTO = livros.stream()
+                .map(livro -> new LivroDTO(
+                        livro.getId(), 
+                        livro.getTitulo(), 
+                        livro.getDescricao(), 
+                        livro.estaEmprestado()
+                )).toList();
+        
+        ListaLivroScreen view = new ListaLivroScreen(livroDTO);
             
-        this.app.call(LivroView.class, "main", livros);
+        view.render();
     }
     
-    public void show(Integer id) {
+    public void mostarLivro(int id) {
         Livro livro = Livro.findOne(id, Livro.class);
+        LivroDTO livroDTO = new LivroDTO(
+                        livro.getId(), 
+                        livro.getTitulo(), 
+                        livro.getDescricao(), 
+                        livro.estaEmprestado()
+        );
+        
+        MostraLivroScreen view = new MostraLivroScreen(livroDTO);
             
-        this.app.call(LivroView.class, "show", livro);
+        view.render();
     }
     
-    public void emprestar(Livro livro) {
+    public void emprestar(LivroDTO livroDTO) {
+        Livro livro = Livro.findOne(livroDTO.getId(), Livro.class);
+        
         livro.emprestar();
         
         livro.save();
+    }
+    
+    public void cadastrar() {
+        CadastraLivroScreen view = new CadastraLivroScreen();
         
-        this.app.call(LivroController.class);
+        view.render();
     }
     
-    public void create() {
-        this.app.call(LivroView.class, "create");
-    }
-    
-    public void guardar(String titulo, String descricao) {
-        Livro livro = new Livro(titulo, descricao);
+    public void guardar(LivroDTO livroDTO) {
+        Livro livro = new Livro(livroDTO.getTitulo(), livroDTO.getDescricao());
         
         livro.save();
-        
-        this.app.call(LivroController.class);
     }
 }
