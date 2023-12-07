@@ -8,14 +8,16 @@ public class Livro extends Model<Livro> {
     private String titulo;
     private String descricao;
     private Boolean emprestado;
+    private String autor;
     
     public Livro() { super(); }
-    public Livro(String titulo, String descricao) {
+    public Livro(String titulo, String descricao, String autor) {
         super();
         
         this.titulo = titulo;
         this.descricao = descricao;
         this.emprestado = false;
+        this.autor = autor;
     }
     
     public void emprestar() {
@@ -53,4 +55,13 @@ public class Livro extends Model<Livro> {
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
+
+    public String getAutor() {
+        return autor;
+    }
+
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
+
 }

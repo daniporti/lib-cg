@@ -14,8 +14,11 @@ public class CadastraLivroScreen extends View {
         System.out.print("Digite a descricao do livro: ");
         String descricao = this.scanner.nextLine();
         System.out.println("");
+        System.out.print("Digite o autor do livro: ");
+        String autor = this.scanner.nextLine();
+        System.out.println("");
         
-        LivroDTO livro = new LivroDTO(titulo, descricao);
+        LivroDTO livro = new LivroDTO(titulo, descricao, autor);
         
         LivroController livroController = this.app.make(LivroController.class);
         

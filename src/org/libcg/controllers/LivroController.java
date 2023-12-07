@@ -9,6 +9,7 @@ import org.libcg.views.livro.CadastraLivroScreen;
 import org.libcg.views.livro.ListaLivroScreen;
 import org.libcg.views.livro.LivrosPrincipalScreen;
 import org.libcg.views.livro.MostraLivroScreen;
+import org.libcg.views.livro.RemoverLivroScreen;
 
 public class LivroController extends Controller {
     
@@ -26,7 +27,8 @@ public class LivroController extends Controller {
                         livro.getId(), 
                         livro.getTitulo(), 
                         livro.getDescricao(), 
-                        livro.estaEmprestado()
+                        livro.estaEmprestado(),
+                        livro.getAutor()
                 )).toList();
         
         ListaLivroScreen view = new ListaLivroScreen(livroDTO);
@@ -40,7 +42,8 @@ public class LivroController extends Controller {
                         livro.getId(), 
                         livro.getTitulo(), 
                         livro.getDescricao(), 
-                        livro.estaEmprestado()
+                        livro.estaEmprestado(),
+                        livro.getAutor()
         );
         
         MostraLivroScreen view = new MostraLivroScreen(livroDTO);
@@ -63,7 +66,19 @@ public class LivroController extends Controller {
     }
     
     public void guardar(LivroDTO livroDTO) {
-        Livro livro = new Livro(livroDTO.getTitulo(), livroDTO.getDescricao());
+        Livro livro = new Livro(livroDTO.getTitulo(), livroDTO.getDescricao(), livroDTO.getAutor());
+        
+        livro.save();
+    }
+
+    public void remover(LivroDTO livroDTO) {
+        Livro livro = Livro.findOne(livroDTO.getId(), Livro.class);
+        
+        livro.save();
+    }
+
+    public void atualiza(LivroDTO livroDTO, int id) {
+        Livro livro = Livro.findOne(id, Livro.class);
         
         livro.save();
     }

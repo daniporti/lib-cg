@@ -11,6 +11,8 @@ public class LivrosPrincipalScreen extends View {
         System.out.println("Bem vindo a sessao de locacao de livros!");
         System.out.println("Digite 1 para ver os livros disponíveis");
         System.out.println("Digite 2 para cadastrar um livro");
+        System.out.println("Digite 3 para remover um livro");
+        System.out.println("Digite 4 para atualizar um livro");
         System.out.println("Digite 0 para sair");
         System.out.println("=====================================");
         int opcao = this.scanner.nextInt();
@@ -21,6 +23,8 @@ public class LivrosPrincipalScreen extends View {
         switch(opcao) {
             case 1 -> livroController.listar();
             case 2 -> livroController.cadastrar();
+            case 3 -> livroController.remover(null);
+            case 4 -> livroController.atualiza();
             default -> menuController.principal();
         }
     }
